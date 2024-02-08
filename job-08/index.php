@@ -114,7 +114,7 @@ class Product
     }
     public function getPrice()
     {
-        echo  '</br>';
+        echo '</br>';
         return $this->price;
     }
     public function setPrice($price)
@@ -136,7 +136,7 @@ class Product
     }
     public function getQuantity()
     {
-        echo  '</br>';
+        echo '</br>';
         return $this->quantity;
     }
     public function setQuantity($quantity)
@@ -172,6 +172,19 @@ class Product
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
+    }
+    public function findAll()
+    {
+        $sql = "SELECT * FROM product";
+        $statement = $this->pdo->prepare($sql);
+        $statement->execute();
+        $resultat = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $return = '';
+        echo 'Products :</br>';
+        foreach ($resultat as $result) {
+            foreach ($result as $result2) {
+            }
+        }
     }
 }
 class Category
@@ -211,7 +224,6 @@ class Category
     }
 }
 
-
 $product = new Product($pdo);
 
-$product->getOneById(7);
+$product->findAll();
