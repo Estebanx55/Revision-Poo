@@ -13,14 +13,14 @@ class Product
     private int $id;
     private int $category_id;
     private string $name;
-    private string $photo;
+    private $photo;
     private int $price;
     private string $description;
     private int $quantity;
     private $createdAt;
     private $updatedAt;
 
-    public function __construct(PDO $pdo, $id = 0, $category_id = 0, $name = '', $photo = '', $price = 0, $description = '', $quantity = 0, $createdAt = new DateTime, $updatedAt = new DateTime)
+    public function __construct(PDO $pdo, $id = 0, $category_id = 0, $name = [], $photo = '', $price = 0, $description = '', $quantity = 0, $createdAt = new DateTime, $updatedAt = new DateTime)
     {
         $this->pdo = $pdo;
         $this->id = $id;
@@ -101,12 +101,20 @@ class Product
     }
     public function getPhoto()
     {
-        $image = json_decode($this->photo, true);
-        $arrayImage = '';
-        foreach ($image as $key) {
-            $arrayImage .= "<img src=$key></img></br>";
+        if ($this->photo == array()) {
+            $arrayImage = '';
+            foreach ($this->photo as $key) {
+                $arrayImage .= "<img src=$key></img></br>";
+            }
+            return $arrayImage;
+        } else {
+            $image = json_decode($this->photo, true);
+            $arrayImage = '';
+            foreach ($image as $key) {
+                $arrayImage .= "<img src=$key></img></br>";
+            }
+            return $arrayImage;
         }
-        return $arrayImage;
     }
     public function setPhoto($photo)
     {
@@ -150,7 +158,7 @@ class Product
             $date = 'ERROR NO DATA';
         } else {
             echo '<br>';
-            $date = $this->createdAt;
+            $date = $this->createdAt->format('Y-m-d H:i:s');
         }
         return $date;
     }
@@ -165,7 +173,7 @@ class Product
             $dateU = 'ERROR NO DATA';
         } else {
             echo '<br>';
-            $dateU = $this->createdAt;
+            $dateU = $this->createdAt->format('Y-m-d H:i:s');
         }
         return $dateU;
     }
@@ -177,16 +185,10 @@ class Product
     public function findAll()
     {
         $pdo = $this->pdo;
-
-
         $products = [];
-
         $sql = "SELECT * FROM product";
-
         $statement = $pdo->query($sql);
-
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-        
             $product = new Product(
                 $pdo,
                 $row['id'],
@@ -201,7 +203,6 @@ class Product
             );
             $products[] = $product;
         }
-        
         $number = 1;
         foreach ($products as $product) {
             echo 'Product ' . $number . ' :</br>';
@@ -218,6 +219,27 @@ class Product
             echo '</br>';
             $number++;
         }
+    }
+    public function createProduct()
+    {
+        $pdo = $this->pdo;
+        $sql = "INSERT INTO product (id_category, name, photos, price, description, quantity, created_at, update_at) VALUES (:id_category, :name, :photos, :price, :description, :quantity, :created_at, :update_at)";
+        $statement = $pdo->prepare($sql);
+        $statement->bindParam(':id_category', $this->category_id, PDO::PARAM_INT);
+        $statement->bindParam(':name', $this->name, PDO::PARAM_STR);
+        if (is_array($this->photo)) {
+            $this->photo = json_encode($this->photo);
+        }
+        $statement->bindParam(':photos', $this->photo, PDO::PARAM_STR);
+        $statement->bindParam(':price', $this->price, PDO::PARAM_INT);
+        $statement->bindParam(':description', $this->description, PDO::PARAM_STR);
+        $statement->bindParam(':quantity', $this->quantity, PDO::PARAM_INT);
+        $createdAt = $this->createdAt->format('Y-m-d H:i:s'); 
+        $updatedAt = $this->updatedAt->format('Y-m-d H:i:s'); 
+        $statement->bindParam(':created_at', $createdAt, PDO::PARAM_STR);
+        $statement->bindParam(':update_at', $updatedAt, PDO::PARAM_STR);
+        $statement->execute();
+        return $pdo->lastInsertId();
     }
 }
 class Category
@@ -257,5 +279,6 @@ class Category
     }
 }
 
-$product = new Product($pdo);
-$product->findAll();
+$product = new Product($pdo, 0, 2, 'Shoes', ["https:\/\/picsum.photos\/200\/300"], 85, 'Good pair of shoes', 6, new DateTime(), new DateTime());
+
+$product->createProduct();
