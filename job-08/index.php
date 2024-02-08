@@ -206,9 +206,23 @@ class Product
             // Ajout de l'instance au tableau
             $products[] = $product;
         }
-
-        // Retourne le tableau contenant toutes les instances de Product
-        return $products;
+        
+        $number = 1;
+        foreach ($products as $product) {
+            echo 'Product ' . $number . ' :</br>';
+            echo $product->getCategory_id();
+            echo $product->getName();
+            echo $product->getPhoto();
+            echo $product->getPrice();
+            echo $product->getDescription();
+            echo $product->getQuantity();
+            echo $product->getCreatedAt();
+            echo $product->getUpdatedAt();
+            echo '</br>';
+            echo '----------';
+            echo '</br>';
+            $number++;
+        }
     }
 }
 class Category
@@ -249,17 +263,4 @@ class Category
 }
 
 $product = new Product($pdo);
-$allProducts = $product->findAll();
-
-print_r($allProducts);
-
-foreach ($allProducts as $product) {
-    echo $product->getCategory_id();
-    echo $product->getName();
-    echo $product->getPhoto();
-    echo $product->getPrice();
-    echo $product->getDescription();
-    echo $product->getQuantity();
-    echo $product->getCreatedAt();
-    echo $product->getUpdatedAt();
-}
+$product->findAll();
