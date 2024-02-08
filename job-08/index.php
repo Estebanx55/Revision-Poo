@@ -173,18 +173,42 @@ class Product
     {
         $this->updatedAt = $updatedAt;
     }
+
     public function findAll()
     {
+        $pdo = $this->pdo;
+
+
+        $products = [];
+
+        // Requête SQL pour sélectionner toutes les lignes de la table Product
         $sql = "SELECT * FROM product";
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute();
-        $resultat = $statement->fetchAll(PDO::FETCH_ASSOC);
-        $return = '';
-        echo 'Products :</br>';
-        foreach ($resultat as $result) {
-            foreach ($result as $result2) {
-            }
+
+        // Préparation et exécution de la requête
+        $statement = $pdo->query($sql);
+
+        // Parcours des résultats et création d'une instance de Product pour chaque ligne
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            // Création d'une nouvelle instance de Product avec les données de la ligne
+            $product = new Product(
+                $pdo,
+                $row['id'],
+                $row['id_category'],
+                $row['name'],
+                $row['photos'],
+                $row['price'],
+                $row['description'],
+                $row['quantity'],
+                $row['created_at'],
+                $row['update_at']
+            );
+
+            // Ajout de l'instance au tableau
+            $products[] = $product;
         }
+
+        // Retourne le tableau contenant toutes les instances de Product
+        return $products;
     }
 }
 class Category
@@ -225,5 +249,17 @@ class Category
 }
 
 $product = new Product($pdo);
+$allProducts = $product->findAll();
 
-$product->findAll();
+print_r($allProducts);
+
+foreach ($allProducts as $product) {
+    echo $product->getCategory_id();
+    echo $product->getName();
+    echo $product->getPhoto();
+    echo $product->getPrice();
+    echo $product->getDescription();
+    echo $product->getQuantity();
+    echo $product->getCreatedAt();
+    echo $product->getUpdatedAt();
+}
