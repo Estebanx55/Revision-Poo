@@ -150,7 +150,7 @@ class Product
             $date = 'ERROR NO DATA';
         } else {
             echo '<br>';
-            $date = $this->createdAt->format('Y-m-d H:i:s');
+            $date = $this->createdAt;
         }
         return $date;
     }
@@ -165,7 +165,7 @@ class Product
             $dateU = 'ERROR NO DATA';
         } else {
             echo '<br>';
-            $dateU = $this->createdAt->format('Y-m-d H:i:s');
+            $dateU = $this->createdAt;
         }
         return $dateU;
     }
