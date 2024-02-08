@@ -40,6 +40,7 @@ class Product
         $statement->bindParam(':id', $id, PDO::PARAM_INT);
         $statement->execute();
         $product = $statement->fetch(PDO::FETCH_ASSOC);
+        $this->id = $product['id'];
         $this->category_id = $product['id_category'];
         $this->name = $product['name'];
         $this->photo = $product['photos'];
@@ -158,12 +159,15 @@ class Product
             $date = 'ERROR NO DATA';
         } else {
             echo '<br>';
-            $date = $this->createdAt->format('Y-m-d H:i:s');
+            $date = $this->createdAt;
         }
         return $date;
     }
     public function setCreatedAt($createdAt)
     {
+        if ($this->createdAt === null) {
+            $this->createdAt = '';
+        }
         $this->createdAt = $createdAt;
     }
     public function getUpdatedAt()
@@ -173,12 +177,15 @@ class Product
             $dateU = 'ERROR NO DATA';
         } else {
             echo '<br>';
-            $dateU = $this->createdAt->format('Y-m-d H:i:s');
+            $dateU = $this->createdAt;
         }
         return $dateU;
     }
     public function setUpdatedAt($updatedAt)
     {
+        if ($this->updatedAt === null) {
+            $this->updatedAt = '';
+        }
         $this->updatedAt = $updatedAt;
     }
 
@@ -241,6 +248,42 @@ class Product
         $statement->execute();
         return $pdo->lastInsertId();
     }
+    public function updateProduct() {
+        $pdo = $this->pdo;
+        $sql = "UPDATE product SET id_category = :id_category, name = :name, photos = :photos, price = :price, description = :description, quantity = :quantity, created_at = :created_at, update_at = :update_at WHERE id = :id";
+        $statement = $pdo->prepare($sql);
+        $statement->bindParam(':id_category', $this->category_id, PDO::PARAM_INT);
+        $statement->bindParam(':name', $this->name, PDO::PARAM_STR);
+        if (is_array($this->photo)) {
+            $this->photo = json_encode($this->photo);
+        }
+        $statement->bindParam(':photos', $this->photo, PDO::PARAM_STR);
+        $statement->bindParam(':price', $this->price, PDO::PARAM_INT);
+        $statement->bindParam(':description', $this->description, PDO::PARAM_STR);
+        $statement->bindParam(':quantity', $this->quantity, PDO::PARAM_INT);
+        if ($this->createdAt === null) {
+            $this->createdAt = New DateTime();
+        } 
+        if (is_string($this->createdAt)) {
+            $createdAt = $this->createdAt;
+        } else {
+            $createdAt = $this->createdAt->format('Y-m-d H:i:s');
+        }
+        if ($this->updatedAt === null) {
+            $updatedAt = New DateTime();
+        }
+        var_dump($this->updatedAt);
+        if (is_string($this->updatedAt)) {
+            $updatedAt = $this->updatedAt;
+        } else {
+           $updatedAt = $this->updatedAt->format('Y-m-d H:i:s');
+        }
+        $statement->bindParam(':created_at', $createdAt, PDO::PARAM_STR);
+        $statement->bindParam(':update_at', $updatedAt, PDO::PARAM_STR);
+        $statement->bindParam(':id', $this->id, PDO::PARAM_INT);
+        $statement->execute();
+        return $pdo->lastInsertId();
+    }
 }
 class Category
 {
@@ -279,6 +322,12 @@ class Category
     }
 }
 
-$product = new Product($pdo, 0, 2, 'Shoes', ["https:\/\/picsum.photos\/200\/300"], 85, 'Good pair of shoes', 6, new DateTime(), new DateTime());
+$new = new Product($pdo);
 
-$product->createProduct();
+$new->getOneById(6);
+
+$new->setName('Glasses');
+
+$new->updateProduct();
+
+
