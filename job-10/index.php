@@ -102,7 +102,7 @@ class Product
     }
     public function getPhoto()
     {
-        if ($this->photo == array()) {
+        if (is_array($this->photo)) {
             $arrayImage = '';
             foreach ($this->photo as $key) {
                 $arrayImage .= "<img src=$key></img></br>";
@@ -112,7 +112,7 @@ class Product
             $image = json_decode($this->photo, true);
             $arrayImage = '';
             foreach ($image as $key) {
-                $arrayImage .= "<img src=$key></img></br>";
+                $arrayImage .= "<img src=$key>c</img></br>";
             }
             return $arrayImage;
         }
@@ -329,5 +329,3 @@ $new->getOneById(6);
 $new->setName('Glasses');
 
 $new->updateProduct();
-
-
